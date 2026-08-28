@@ -12,3 +12,12 @@ carta-shuka-oficial-*.pdf
 
 # vídeos originales de Instagram (5,7 MB, solo referencia)
 SaveClip.App_AQ*.mp4
+
+# material de referencia del cliente, no forma parte de la web
+SaveClip.App_*
+*Linktree*.pdf
+estilo.jpg
+local1.webp
+local2.webp
+local3.webp
+logo.jpeg
