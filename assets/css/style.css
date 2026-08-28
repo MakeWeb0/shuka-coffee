@@ -322,9 +322,27 @@ body.menu-open .overlay{ visibility:visible; }
 .carta__tabs button:hover{ border-color:var(--ink); }
 .carta__tabs button.is-active{ background:var(--ink); color:var(--ground); border-color:var(--ink); }
 
-.carta__list{
+.carta__list{ margin-top:clamp(2rem,5vw,3.5rem); }
+
+/* un grupo por subsección de la carta real */
+.group + .group{ margin-top:clamp(2.8rem,6vw,4.5rem); }
+.group__title{
+  font-size:clamp(1.5rem, 1rem + 1.6vw, 2.3rem);
+  margin:0 0 .3rem;
+}
+.group__note{
+  margin:0 0 .2rem; font-size:.72rem; letter-spacing:.03em;
+  color:var(--accent);
+}
+.group__items{
+  margin-top:1.4rem;
   display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
   column-gap:clamp(2rem,6vw,6rem);
+}
+.group__extras{
+  margin:1.4rem 0 0; padding:.9rem 1.2rem;
+  border:1px solid var(--rule); border-radius:14px;
+  font-size:.74rem; line-height:1.7; color:var(--soft);
 }
 .item{
   display:grid; grid-template-columns:1fr auto; align-items:baseline;
@@ -332,6 +350,12 @@ body.menu-open .overlay{ visibility:visible; }
   padding:1.15rem 0; border-bottom:1px solid var(--rule-2);
 }
 .item__name{ font-size:clamp(1rem, .85rem + .3vw, 1.12rem); font-weight:300; }
+/* las tostas especiales van numeradas: el número es el nombre y la
+   descripción es lo que hay que leer, así que se cambian los papeles */
+.item--num .item__name{
+  font-family:var(--fd); font-style:italic; font-size:1.1rem; color:var(--accent);
+}
+.item--num .item__desc{ font-size:.95rem; opacity:1; color:var(--ink); }
 .item__price{
   font-family:var(--fd); font-style:italic; font-size:1rem;
   color:var(--accent); font-variant-numeric:tabular-nums;
@@ -388,7 +412,7 @@ body.menu-open .overlay{ visibility:visible; }
    ========================================================= */
 @media (max-width:980px){
   .local__lead{ grid-template-columns:1fr; align-items:start; gap:1.6rem; }
-  .carta__list{ grid-template-columns:1fr; }
+  .group__items{ grid-template-columns:1fr; }
   .info{ grid-template-columns:repeat(2,minmax(0,1fr)); }
 }
 @media (max-width:720px){

@@ -170,21 +170,43 @@
     if (!list) return {};
     let lang = 'es', current = 'cafe';
 
+    const esc = t => String(t == null ? '' : t)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+    /* Un grupo por subsección de la carta real (Cafés, Infusiones eco…).
+       Los platos numerados —las tostas especiales— llevan el número como
+       nombre, así que ahí la descripción es lo que hay que destacar. */
+    function group(g) {
+      const t = lang === 'en' ? g.t_en : g.t_es;
+      const n = lang === 'en' ? g.n_en : g.n_es;
+      const x = lang === 'en' ? g.x_en : g.x_es;
+
+      const items = (g.items || []).map(it => {
+        const name = lang === 'en' ? it.en : it.es;
+        const desc = lang === 'en' ? it.d_en : it.d_es;
+        const num  = /^\d+$/.test(name);
+        return '<div class="item' + (num ? ' item--num' : '') + '">' +
+                 '<span class="item__name">' + esc(name) + '</span>' +
+                 '<span class="item__price">' + esc(it.p) + ' &euro;</span>' +
+                 (desc ? '<span class="item__desc">' + esc(desc) + '</span>' : '') +
+               '</div>';
+      }).join('');
+
+      return '<section class="group">' +
+               '<h3 class="group__title">' + esc(t) + '</h3>' +
+               (n ? '<p class="group__note">' + esc(n) + '</p>' : '') +
+               '<div class="group__items">' + items + '</div>' +
+               (x ? '<p class="group__extras">' + esc(x) + '</p>' : '') +
+             '</section>';
+    }
+
     function render(cat, l) {
       current = cat || current;
       lang = l || lang;
-      const items = (window.SHUKA_MENU || {})[current] || [];
-      list.innerHTML = items.map(it => {
-        const name = lang === 'en' ? it.en : it.es;
-        const desc = lang === 'en' ? it.d_en : it.d_es;
-        return '<div class="item">' +
-                 '<span class="item__name">' + name + '</span>' +
-                 '<span class="item__price">' + it.p + ' &euro;</span>' +
-                 (desc ? '<span class="item__desc">' + desc + '</span>' : '') +
-               '</div>';
-      }).join('');
-      gsap.fromTo($$('.item', list), { opacity: 0, y: 14 },
-        { opacity: 1, y: 0, duration: .55, stagger: .03, ease: 'power2.out' });
+      const groups = (window.SHUKA_MENU || {})[current] || [];
+      list.innerHTML = groups.map(group).join('');
+      gsap.fromTo($$('.group', list), { opacity: 0, y: 14 },
+        { opacity: 1, y: 0, duration: .55, stagger: .06, ease: 'power2.out' });
     }
 
     tabs.addEventListener('click', e => {
