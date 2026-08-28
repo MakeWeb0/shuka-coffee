@@ -1,0 +1,412 @@
+/* =========================================================
+   SHUKA COFFEE — Elche
+   Sus dos colores de marca, el marrón (#412E27) y el blanco
+   roto, alternándose por bloques. Titulares en didone
+   itálica, como sus posts de Instagram.
+   ========================================================= */
+
+:root{
+  --brown:    #412E27;   /* el fondo de su feed, muestreado del post del logo */
+  --brown-dp: #38261F;   /* un punto más hondo: pie y menú */
+  --paper:    #F7F3ED;   /* el blanco roto, cálido */
+  --cream:    #F4EFE8;   /* la crema de su tipografía sobre marrón */
+  --tan:      #C2A78F;   /* tostado de acento sobre marrón */
+  --mocha:    #99806E;   /* bronce del logotipo: acento sobre blanco */
+  --stone:    #E4DCD1;   /* travertino, hueco de las fotos */
+
+  --f:  'Jost', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --fd: 'Bodoni Moda', 'Times New Roman', serif;
+
+  --pad: clamp(1.25rem, 5vw, 6rem);
+  --maxw: 1280px;
+  --nav-h: 76px;
+  /* medio punto real: horizontal 50% / vertical 37,5% sobre una caja 3:4 */
+  --arch-r: 50% 50% 4px 4px / 37.5% 37.5% 3px 3px;
+
+  --e-out: cubic-bezier(.16,1,.3,1);
+}
+
+/* --- los dos temas: cada bloque declara el suyo y todo lo de dentro
+       (texto, filetes, acentos, botones) se sirve de estas variables --- */
+.t-dark{
+  --ground: var(--brown);
+  --ink:    var(--cream);
+  --accent: var(--tan);
+  --soft:   rgba(244,239,232,.62);
+  --faint:  rgba(244,239,232,.42);
+  --rule:   rgba(244,239,232,.16);
+  --rule-2: rgba(244,239,232,.10);
+  --hole:   #4C372E;
+}
+.t-light{
+  --ground: var(--paper);
+  --ink:    var(--brown);
+  --accent: var(--mocha);
+  --soft:   rgba(65,46,39,.66);
+  --faint:  rgba(65,46,39,.45);
+  --rule:   rgba(65,46,39,.16);
+  --rule-2: rgba(65,46,39,.10);
+  --hole:   var(--stone);
+}
+
+*,*::before,*::after{ box-sizing:border-box; }
+html{ -webkit-text-size-adjust:100%; }
+.lenis.lenis-smooth{ scroll-behavior:auto !important; }
+.lenis.lenis-stopped{ overflow:hidden; }
+
+body{
+  margin:0;
+  background:var(--brown);
+  color:var(--cream);
+  font-family:var(--f);
+  font-weight:300;
+  font-size:clamp(.94rem, .6rem + .4vw, 1.02rem);
+  line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+body.no-scroll{ overflow:hidden; }
+
+img{ max-width:100%; display:block; }
+a{ color:inherit; text-decoration:none; }
+button{ font:inherit; color:inherit; background:none; border:0; cursor:pointer; }
+::selection{ background:var(--brown); color:var(--paper); }
+:focus-visible{ outline:2px solid var(--accent, var(--mocha)); outline-offset:4px; }
+
+/* --- titulares: la didone itálica de sus posts, apilada y apretada --- */
+h1,h2,h3{
+  font-family:var(--fd);
+  font-style:italic;
+  font-weight:400;
+  letter-spacing:-.012em;
+  line-height:1.02;
+  margin:0;
+  text-wrap:balance;
+}
+h2{ font-size:clamp(2.1rem, 1rem + 3.9vw, 4.6rem); }
+p{ margin:0 0 1.15em; }
+
+/* cada bloque pinta su fondo a sangre y centra el contenido dentro */
+.sec{ background:var(--ground); color:var(--ink); }
+.wrap{ max-width:var(--maxw); margin-inline:auto; }
+
+/* velo de entrada: el marrón se disuelve cuando la escena está lista */
+.veil{
+  position:fixed; inset:0; z-index:900; background:var(--brown);
+  pointer-events:none;
+}
+
+/* =========================================================
+   NAV — transparente sobre la portada, blanco al bajar
+   ========================================================= */
+.nav{
+  position:fixed; top:0; left:0; right:0; z-index:800;
+  height:var(--nav-h);
+  /* rejilla y no flex: con las columnas laterales a 1fr el centro
+     es el centro real de la pantalla, midan lo que midan los lados */
+  display:grid; grid-template-columns:1fr auto 1fr; align-items:center;
+  padding:0 var(--pad);
+  --ink: var(--cream);
+  --ground: var(--brown);
+  --accent: var(--tan);
+  color:var(--ink);
+  transition:height .4s var(--e-out), color .45s var(--e-out);
+}
+.nav::before{
+  content:''; position:absolute; inset:0; z-index:-1;
+  background:var(--paper);
+  border-bottom:1px solid rgba(65,46,39,.12);
+  opacity:0; transition:opacity .45s var(--e-out);
+}
+.nav.is-solid::before{ opacity:1; }
+.nav.is-solid{ height:64px; --ink:var(--brown); --ground:var(--paper); --accent:var(--mocha); }
+
+.nav__brand{ grid-column:1; justify-self:start; position:relative; display:block; width:78px; }
+.nav__mark{ width:100%; transition:opacity .45s var(--e-out); }
+.nav__mark--dark{ position:absolute; inset:0; opacity:0; }
+.nav.is-solid .nav__mark--light{ opacity:0; }
+.nav.is-solid .nav__mark--dark{ opacity:1; }
+
+.nav__links{ grid-column:2; display:flex; justify-content:center; gap:clamp(1.4rem,3vw,2.8rem); }
+.nav__links a{
+  position:relative; font-size:.74rem; font-weight:300;
+  letter-spacing:.05em; padding:.35rem 0;
+}
+.nav__links a::after{
+  content:''; position:absolute; left:0; right:0; bottom:.1rem; height:1px;
+  background:currentColor; transform:scaleX(0); transform-origin:right;
+  transition:transform .45s var(--e-out);
+}
+.nav__links a:hover::after,
+.nav__links a.is-current::after{ transform:scaleX(1); transform-origin:left; }
+.nav__links a.is-current::after{ opacity:.4; }
+
+.nav__right{ grid-column:3; justify-self:end; display:flex; align-items:center; gap:clamp(.8rem,2vw,1.5rem); }
+.lang{ display:flex; gap:.22rem; font-size:.68rem; letter-spacing:.08em; }
+.lang span{ opacity:.4; transition:opacity .3s; }
+.lang span.is-on{ opacity:1; }
+.lang i{ font-style:normal; opacity:.28; }
+
+.burger{ display:none; width:30px; height:20px; position:relative; }
+.burger i{
+  position:absolute; left:0; width:100%; height:1px; background:currentColor;
+  transition:transform .45s var(--e-out), width .45s var(--e-out);
+}
+.burger i:nth-child(1){ top:6px; }
+.burger i:nth-child(2){ top:13px; width:62%; }
+body.menu-open .nav{ --ink:var(--cream); --ground:var(--brown-dp); }
+body.menu-open .nav::before{ opacity:0; }
+body.menu-open .nav__mark--light{ opacity:1 !important; }
+body.menu-open .nav__mark--dark{ opacity:0 !important; }
+body.menu-open .burger i:nth-child(1){ transform:translateY(3.5px) rotate(45deg); }
+body.menu-open .burger i:nth-child(2){ transform:translateY(-3.5px) rotate(-45deg); width:100%; }
+
+/* =========================================================
+   BOTONES — se tiñen solos según el bloque
+   ========================================================= */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:.85rem 1.7rem; border-radius:999px;
+  font-size:.72rem; letter-spacing:.09em; font-weight:400;
+  border:1px solid currentColor;
+  transition:background .4s var(--e-out), color .4s var(--e-out), border-color .4s var(--e-out);
+}
+.btn--sm{ padding:.55rem 1.15rem; font-size:.68rem; }
+.btn--line:hover,
+.btn--sm:hover{ background:var(--ink); color:var(--ground); border-color:var(--ink); }
+.btn--solid{ background:var(--ink); color:var(--ground); }
+.btn--solid:hover{ background:var(--accent); border-color:var(--accent); color:var(--ground); }
+
+/* =========================================================
+   MENÚ MÓVIL
+   ========================================================= */
+.overlay{
+  position:fixed; inset:0; z-index:790; background:var(--brown-dp); color:var(--cream);
+  display:grid; grid-template-rows:1fr auto;
+  padding:calc(var(--nav-h) + 6vh) var(--pad) 8vh;
+  clip-path:inset(0 0 100% 0);
+  visibility:hidden;
+}
+body.menu-open .overlay{ visibility:visible; }
+.overlay__nav{ display:grid; align-content:center; gap:.35rem; }
+.overlay__nav a{
+  font-family:var(--fd); font-style:italic; font-weight:400;
+  font-size:clamp(2.2rem,10vw,3.6rem); line-height:1.06; letter-spacing:-.012em;
+  opacity:0;
+}
+.overlay__foot{
+  display:flex; flex-wrap:wrap; gap:1rem 2rem; justify-content:space-between;
+  align-items:end; font-size:.8rem; opacity:0;
+  border-top:1px solid rgba(244,239,232,.16); padding-top:1.5rem;
+}
+.overlay__foot p{ margin:0; opacity:.6; }
+.overlay__foot a{ border-bottom:1px solid currentColor; padding-bottom:.15rem; }
+
+/* =========================================================
+   PORTADA — el espejo, sobre el marrón de la marca
+   ========================================================= */
+.hero{
+  position:relative; min-height:100svh;
+  display:grid; place-items:center; overflow:hidden;
+  background:var(--brown); color:var(--cream);
+}
+.hero__gl{ position:absolute; inset:0; width:100%; height:100%; }
+
+/* El rótulo se coloca desde JS justo encima del espejo que dibuja
+   el shader, como el letrero pintado sobre la pared. */
+.hero__sign{
+  position:absolute; z-index:2;
+  left:50%; top:0; transform:translateX(-50%);
+  display:grid; justify-items:center; gap:.9rem; text-align:center;
+  opacity:0;
+}
+.hero__mark{ width:clamp(112px,13vw,164px); }
+.hero__sub{
+  margin:0;
+  font-size:clamp(.52rem, .36rem + .28vw, .66rem);
+  font-weight:300; letter-spacing:.36em; text-transform:uppercase;
+  color:var(--tan);
+}
+
+/* sin WebGL: composición centrada normal */
+.hero:not(.is-gl) .hero__sign{ position:static; transform:none; opacity:1; }
+.hero:not(.is-gl){ align-content:center; }
+
+.hero__cue{
+  position:absolute; left:50%; bottom:2.2rem; transform:translateX(-50%);
+  z-index:3; display:grid; justify-items:center; gap:.6rem;
+  font-size:.64rem; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--cream); opacity:.45; transition:opacity .4s;
+}
+.hero__cue:hover{ opacity:1; }
+.hero__cue svg{ width:11px; height:28px; }
+
+/* =========================================================
+   EL LOCAL — bloque claro
+   ========================================================= */
+.local{ padding:clamp(5rem,12vw,9.5rem) var(--pad) clamp(4.5rem,10vw,8rem); }
+.local__lead{
+  display:grid; grid-template-columns:1.15fr .85fr;
+  gap:clamp(1.5rem,5vw,5rem); align-items:end;
+  padding-bottom:clamp(3rem,7vw,5.5rem);
+}
+.eyebrow{
+  font-family:var(--fd); font-style:italic; font-weight:400;
+  font-size:clamp(.95rem, .7rem + .4vw, 1.2rem);
+  color:var(--accent); margin:0 0 .9rem;
+}
+.local__lead p{
+  margin:0; max-width:38ch; color:var(--soft);
+  font-size:clamp(.95rem, .7rem + .42vw, 1.1rem); line-height:1.75;
+}
+
+.local__pair{
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:clamp(1.2rem,5vw,5rem); align-items:start;
+}
+.arch{ margin:0; }
+.arch--r{ padding-top:clamp(1.5rem,7vw,6rem); }
+.arch__frame{
+  position:relative; overflow:hidden;
+  aspect-ratio:3/4;
+  border-radius:var(--arch-r);
+  background:var(--hole);
+}
+.arch__frame img{
+  width:100%; height:100%; object-fit:cover;
+  transform:scale(1.03);
+  transition:transform 1.2s var(--e-out);
+}
+.arch:hover .arch__frame img{ transform:scale(1); }
+.arch figcaption{
+  margin-top:.9rem; font-size:.66rem; letter-spacing:.2em;
+  text-transform:uppercase; color:var(--accent);
+}
+
+/* =========================================================
+   LA FRASE — bloque marrón, como uno de sus posts
+   ========================================================= */
+.claim{
+  padding:clamp(5rem,13vw,10rem) var(--pad);
+  text-align:center;
+}
+.claim p{
+  margin:0;
+  font-family:var(--fd); font-style:italic; font-weight:400;
+  font-size:clamp(1.9rem, 1rem + 3.6vw, 4.2rem);
+  line-height:1.02; letter-spacing:-.015em;
+}
+.claim__by{
+  margin:clamp(1.6rem,3vw,2.4rem) 0 0 !important;
+  font-family:var(--f) !important; font-style:normal !important;
+  font-size:.66rem !important; letter-spacing:.24em; text-transform:uppercase;
+  color:var(--accent); line-height:1.6 !important;
+}
+
+/* =========================================================
+   CARTA — bloque claro
+   ========================================================= */
+.carta{ padding:clamp(4rem,10vw,7.5rem) var(--pad) clamp(4rem,9vw,7rem); }
+.carta__head{
+  display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between;
+  gap:1.5rem; padding-bottom:2.2rem;
+  border-bottom:1px solid var(--rule);
+}
+.carta__tabs{ display:flex; flex-wrap:wrap; gap:.4rem; }
+.carta__tabs button{
+  padding:.5rem 1.05rem; border-radius:999px;
+  border:1px solid var(--rule);
+  font-size:.68rem; letter-spacing:.07em; font-weight:300;
+  transition:background .35s var(--e-out), color .35s var(--e-out), border-color .35s;
+}
+.carta__tabs button:hover{ border-color:var(--ink); }
+.carta__tabs button.is-active{ background:var(--ink); color:var(--ground); border-color:var(--ink); }
+
+.carta__list{
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+  column-gap:clamp(2rem,6vw,6rem);
+}
+.item{
+  display:grid; grid-template-columns:1fr auto; align-items:baseline;
+  gap:.2rem .9rem;
+  padding:1.15rem 0; border-bottom:1px solid var(--rule-2);
+}
+.item__name{ font-size:clamp(1rem, .85rem + .3vw, 1.12rem); font-weight:300; }
+.item__price{
+  font-family:var(--fd); font-style:italic; font-size:1rem;
+  color:var(--accent); font-variant-numeric:tabular-nums;
+}
+.item__desc{ grid-column:1 / -1; font-size:.78rem; font-weight:300; color:var(--faint); line-height:1.6; }
+.carta__note{
+  margin:2rem 0 0; font-size:.66rem; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--faint);
+}
+
+/* =========================================================
+   VISITA — bloque marrón
+   ========================================================= */
+.visita{ padding:clamp(4.5rem,11vw,8.5rem) var(--pad) clamp(4.5rem,10vw,8rem); }
+.info{
+  display:grid; grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:2.4rem clamp(1.5rem,4vw,3rem);
+  margin:clamp(2.5rem,6vw,4rem) 0;
+}
+.info dt{
+  font-size:.64rem; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--accent); margin-bottom:.6rem;
+}
+.info dd{ margin:0; color:var(--soft); font-size:.95rem; }
+.info dd a{ border-bottom:1px solid var(--rule); transition:border-color .3s, color .3s; }
+.info dd a:hover{ border-color:var(--accent); color:var(--accent); }
+.visita__cta{ display:flex; flex-wrap:wrap; gap:.7rem; }
+
+/* =========================================================
+   PIE
+   ========================================================= */
+.foot{
+  background:var(--brown-dp); color:var(--cream);
+  padding:clamp(3.5rem,8vw,6rem) var(--pad) 1.8rem;
+  display:grid; justify-items:center; gap:clamp(2.5rem,6vw,4rem);
+}
+.foot__mark{ width:clamp(150px,20vw,260px); opacity:.9; }
+.foot__row{
+  width:100%; max-width:var(--maxw);
+  display:flex; flex-wrap:wrap; justify-content:space-between; gap:.8rem;
+  border-top:1px solid rgba(244,239,232,.14); padding-top:1.4rem;
+  font-size:.66rem; letter-spacing:.14em; text-transform:uppercase; opacity:.5;
+}
+.foot__row p{ margin:0; }
+.foot__row a:hover{ color:var(--tan); opacity:1; }
+
+/* =========================================================
+   REVELADOS
+   ========================================================= */
+[data-rise]{ opacity:0; }
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+@media (max-width:980px){
+  .local__lead{ grid-template-columns:1fr; align-items:start; gap:1.6rem; }
+  .carta__list{ grid-template-columns:1fr; }
+  .info{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width:720px){
+  .nav__links{ display:none; }
+  .nav .btn--sm{ display:none; }
+  .burger{ display:block; }
+  .local__pair{ grid-template-columns:1fr; gap:2.5rem; justify-items:center; }
+  .arch--r{ padding-top:0; }
+  .arch{ width:100%; max-width:420px; }
+}
+@media (max-width:560px){
+  .hero__sub{ letter-spacing:.22em; }
+}
+@media (max-width:480px){
+  .info{ grid-template-columns:1fr; }
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
+  [data-rise]{ opacity:1 !important; }
+}

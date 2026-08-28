@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Shuka Coffee — Coffee, bowls, toast &amp; more · Elche</title>
+<meta name="description" content="Shuka Coffee. Café de especialidad, bowls y tostadas en la Plaza de la Fruta, Elche. If this is your vibe, this is your place.">
+<meta name="theme-color" content="#412E27">
+<link rel="icon" href="assets/brand/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="assets/brand/favicon-180.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Shuka Coffee — Coffee, bowls, toast &amp; more · Elche">
+<meta property="og:description" content="If this is your vibe, this is your place.">
+<meta property="og:image" content="assets/brand/favicon-512.png">
+<link rel="preload" href="assets/fonts/jost-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/bodoni-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/fonts.css">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<div class="veil" id="veil" aria-hidden="true"></div>
+
+<header class="nav" id="nav">
+  <a class="nav__brand" href="#top" aria-label="Shuka Coffee, inicio">
+    <img src="assets/brand/wordmark-light.png" alt="Shuka Coffee" class="nav__mark nav__mark--light">
+    <img src="assets/brand/wordmark.png" alt="" aria-hidden="true" class="nav__mark nav__mark--dark">
+  </a>
+
+  <nav class="nav__links" aria-label="Principal">
+    <a href="#local"><span data-i18n="nav.local">El local</span></a>
+    <a href="#carta"><span data-i18n="nav.carta">Carta</span></a>
+    <a href="#visita"><span data-i18n="nav.visita">Visítanos</span></a>
+  </nav>
+
+  <div class="nav__right">
+    <button class="lang" id="lang" aria-label="Cambiar idioma / Switch language">
+      <span class="is-on">ES</span><i>/</i><span>EN</span>
+    </button>
+    <a class="btn btn--sm" href="#visita"><span data-i18n="nav.cta">Cómo llegar</span></a>
+    <button class="burger" id="burger" aria-label="Menú" aria-expanded="false"><i></i><i></i></button>
+  </div>
+</header>
+
+<div class="overlay" id="overlay">
+  <nav class="overlay__nav">
+    <a href="#local" data-i18n="nav.local">El local</a>
+    <a href="#carta" data-i18n="nav.carta">Carta</a>
+    <a href="#visita" data-i18n="nav.visita">Visítanos</a>
+  </nav>
+  <div class="overlay__foot">
+    <p data-i18n-html="ov.hours">Lun — Vie · 8:30 — 16:00<br>Sábado · 8:30 — 14:00</p>
+    <a href="https://www.instagram.com/shuka_coffee/" target="_blank" rel="noopener">Instagram</a>
+  </div>
+</div>
+
+<main id="top">
+
+<!-- ============ PORTADA ============ -->
+<section class="hero" id="hero">
+  <canvas class="hero__gl" id="heroGl" aria-hidden="true"></canvas>
+
+  <!-- El rótulo va colgado encima del espejo: lo coloca placeSign() en
+       píxeles, que es donde se conoce la geometría real del shader. -->
+  <div class="hero__sign">
+    <img class="hero__mark" src="assets/brand/wordmark-light.png" alt="Shuka Coffee">
+    <p class="hero__sub">Coffee, bowls, toast &amp; more</p>
+  </div>
+
+  <a class="hero__cue" href="#local" aria-label="Bajar">
+    <span data-i18n="hero.cue">Pasa dentro</span>
+    <svg viewBox="0 0 12 30" aria-hidden="true"><path d="M6 0v27M1 22l5 6 5-6" fill="none" stroke="currentColor" stroke-width="1"/></svg>
+  </a>
+</section>
+
+<!-- ============ EL LOCAL ============ -->
+<section class="sec t-light local" id="local">
+  <div class="wrap">
+  <div class="local__lead">
+    <div>
+      <p class="eyebrow" data-i18n="local.eyebrow">Chic, elegant, classy.</p>
+      <h2 data-i18n-html="local.title">Travertino, arcos<br>y luz cálida en el<br>centro de Elche.</h2>
+    </div>
+    <p data-i18n="local.p1">Café de especialidad desde primera hora, bowls y tostadas hasta media tarde. Sin reserva: llegas, te sientas y te quedas.</p>
+  </div>
+
+  <div class="local__pair">
+    <figure class="arch arch--l">
+      <div class="arch__frame"><img src="assets/img/sala.webp" alt="Sala de Shuka Coffee con mesas altas, sillas de ratán y espejos de mimbre" loading="lazy"></div>
+      <figcaption data-i18n="local.cap1">La sala</figcaption>
+    </figure>
+    <figure class="arch arch--r">
+      <div class="arch__frame"><img src="assets/img/rincon.webp" alt="Rincón de Shuka Coffee: banco tapizado y hornacina iluminada" loading="lazy"></div>
+      <figcaption data-i18n="local.cap2">El rincón</figcaption>
+    </figure>
+  </div>
+  </div>
+</section>
+
+<!-- ============ LA FRASE ============ -->
+<section class="sec t-dark claim">
+  <p>If this is your vibe,<br>this is your place.</p>
+  <p class="claim__by">@shuka_coffee</p>
+</section>
+
+<!-- ============ CARTA ============ -->
+<section class="sec t-light carta" id="carta">
+  <div class="wrap">
+  <div class="carta__head">
+    <h2 data-i18n="carta.title">Carta</h2>
+    <div class="carta__tabs" id="cartaTabs" role="tablist">
+      <button class="is-active" data-tab="cafe" role="tab" aria-selected="true"><span data-i18n="carta.t1">Café</span></button>
+      <button data-tab="brunch" role="tab" aria-selected="false"><span data-i18n="carta.t2">Tostas</span></button>
+      <button data-tab="bowls" role="tab" aria-selected="false"><span data-i18n="carta.t3">Bowls</span></button>
+      <button data-tab="dulce" role="tab" aria-selected="false"><span data-i18n="carta.t4">Dulce</span></button>
+    </div>
+  </div>
+  <div class="carta__list" id="cartaList"></div>
+  <p class="carta__note" data-i18n="carta.note">Carta de muestra · sujeta a temporada y disponibilidad</p>
+  </div>
+</section>
+
+<!-- ============ VISITA ============ -->
+<section class="sec t-dark visita" id="visita">
+  <div class="wrap">
+  <h2 data-i18n-html="visita.title">En la Plaza de la Fruta,<br>número 24.</h2>
+
+  <dl class="info">
+    <div>
+      <dt data-i18n="visita.dir">Dirección</dt>
+      <dd data-i18n-html="visita.dirV">Plaza de la Fruta, 24<br>03202 Elche · Alicante</dd>
+    </div>
+    <div>
+      <dt data-i18n="visita.hor">Horario</dt>
+      <dd data-i18n-html="visita.horV">Lunes a viernes · 8:30 — 16:00<br>Sábado · 8:30 — 14:00<br>Domingo · cerrado</dd>
+    </div>
+    <div>
+      <dt data-i18n="visita.res">Reservas</dt>
+      <dd data-i18n="visita.resV">Sin reserva. Llega y siéntate.</dd>
+    </div>
+    <div>
+      <dt data-i18n="visita.sig">Síguenos</dt>
+      <dd><a href="https://www.instagram.com/shuka_coffee/" target="_blank" rel="noopener">@shuka_coffee</a></dd>
+    </div>
+  </dl>
+
+  <div class="visita__cta">
+    <a class="btn btn--solid" href="https://maps.google.com/?q=Shuka+Coffee%2C+Plaza+de+la+Fruta+24%2C+03202+Elche%2C+Alicante" target="_blank" rel="noopener"><span data-i18n="visita.cta1">Cómo llegar</span></a>
+    <a class="btn btn--line" href="https://www.instagram.com/shuka_coffee/" target="_blank" rel="noopener"><span data-i18n="visita.cta2">Ver Instagram</span></a>
+  </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <img class="foot__mark" src="assets/brand/wordmark-light.png" alt="Shuka Coffee">
+  <div class="foot__row">
+    <p>© <span id="year">2026</span> Shuka Coffee · Elche</p>
+    <a href="https://www.instagram.com/shuka_coffee/" target="_blank" rel="noopener">Instagram</a>
+  </div>
+</footer>
+
+<script src="assets/vendor/gsap.min.js"></script>
+<script src="assets/vendor/ScrollTrigger.min.js"></script>
+<script src="assets/vendor/lenis.min.js"></script>
+<script src="assets/vendor/three.min.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/hero-gl.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
