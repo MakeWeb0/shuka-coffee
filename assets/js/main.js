@@ -7,6 +7,7 @@
   const $  = (s, c) => (c || document).querySelector(s);
   const $$ = (s, c) => Array.prototype.slice.call((c || document).querySelectorAll(s));
   const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const COARSE  = window.matchMedia('(hover: none), (pointer: coarse)').matches;
 
   gsap.registerPlugin(ScrollTrigger);
 
@@ -21,44 +22,37 @@
     else el.scrollIntoView({ behavior: 'smooth' });
   };
 
-  /* ---------- portada WebGL ---------- */
-  const heroOk = window.ShukaHero && window.ShukaHero.init($('#heroGl'), 'assets/img/barra.webp');
-  if (!heroOk && $('#heroGl')) $('#heroGl').style.display = 'none';
+  /* ---------- portada: los tres vídeos ---------- */
+  const videos = $$('.hero__videos video');
+  /* Con reduced-motion se congelan en su póster. Y si el navegador
+     bloquea el autoplay pese al muted, no pasa nada: el póster ya es
+     un fotograma del propio vídeo. */
+  videos.forEach(v => {
+    v.muted = true;                 /* algunos navegadores lo exigen por JS */
+    if (REDUCED) { v.removeAttribute('autoplay'); v.pause(); return; }
+    const play = v.play();
+    if (play && play.catch) play.catch(() => {});
+  });
 
-  /* El rótulo se cuelga justo encima del espejo: se coloca en píxeles
-     porque es el shader quien sabe dónde ha quedado la corona de mimbre. */
-  const sign = $('.hero__sign'), mark = $('.hero__mark');
-
-  function placeSign() {
-    const r = heroOk && window.ShukaHero.frameRect();
-    if (!r) return;
-    $('.hero').classList.add('is-gl');
-    const gap = Math.max(20, Math.min(44, r.height * 0.10));
-    const top = Math.max(r.top - sign.offsetHeight - gap, 84);
-    sign.style.top = top + 'px';
+  /* no gastar batería con la portada fuera de pantalla */
+  if (!REDUCED && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(es => {
+      es.forEach(e => {
+        if (e.isIntersecting) { const p = e.target.play(); if (p && p.catch) p.catch(() => {}); }
+        else e.target.pause();
+      });
+    }, { threshold: 0 });
+    videos.forEach(v => io.observe(v));
   }
-  window.addEventListener('resize', placeSign);
-  if (!mark.complete) mark.addEventListener('load', placeSign);
-  placeSign();
 
-  let last = performance.now();
   (function raf(now) {
-    const dt = Math.min((now - last) / 1000, 0.05);
-    last = now;
     if (lenis) lenis.raf(now);
-    if (heroOk) window.ShukaHero.tick(dt);
     requestAnimationFrame(raf);
-  })(last);
+  })(performance.now());
 
   /* ---------- entrada ---------- */
   function enter() {
     const tl = gsap.timeline();
-    if (heroOk) {
-      tl.to({ v: 0 }, {
-        v: 1, duration: 1.5, ease: 'power2.inOut',
-        onUpdate: function () { window.ShukaHero.setReveal(this.targets()[0].v); }
-      }, 0);
-    }
     tl.to('#veil', {
         opacity: 0, duration: 1.0, ease: 'power2.inOut',
         onComplete: () => gsap.set('#veil', { display: 'none' })
@@ -73,14 +67,12 @@
     gsap.set('#veil', { display: 'none' });
     gsap.set('.hero__sign', { opacity: 1 });
     gsap.set('.hero__cue', { opacity: .45 });
-    heroOk && window.ShukaHero.setReveal(1);
-  } else if (heroOk) {
+  } else {
     let started = false;
     const start = () => { if (!started) { started = true; enter(); } };
-    window.ShukaHero.onTexture = start;
-    setTimeout(start, 2200);            /* por si la imagen tarda o falla */
-  } else {
-    enter();
+    /* en cuanto el primer vídeo tenga imagen; y un tope por si falla */
+    if (videos[0]) videos[0].addEventListener('loadeddata', start, { once: true });
+    setTimeout(start, 1600);
   }
 
   /* ---------- nav ---------- */
@@ -88,13 +80,6 @@
   const onScroll = () => nav.classList.toggle('is-solid', window.scrollY > 40);
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
-
-  if (heroOk) {
-    ScrollTrigger.create({
-      trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true,
-      onUpdate: s => window.ShukaHero.setScroll(s.progress)
-    });
-  }
 
   /* fromTo con immediateRender:false — si no, GSAP graba el opacity:0 del CSS
      como valor de partida y el rótulo se apaga al primer scroll. */
@@ -161,8 +146,89 @@
       });
     });
   }
-  ['.local__lead .eyebrow', '.local__lead h2', '.local__lead p', '.arch', '.claim p', '.carta__head',
+  ['.local__lead .eyebrow', '.local__lead p', '.claim p', '.carta__head',
    '.visita h2', '.info > div', '.visita__cta', '.foot__mark'].forEach(rise);
+
+  /* ---------- El local ----------------------------------------------
+     El titular sale línea a línea desde detrás de una máscara, los dos
+     arcos se abren de abajo arriba y sus fotos van más lentas que el
+     marco al desplazar. Todo se rearma al cambiar de idioma, porque el
+     diccionario reescribe el innerHTML del titular. */
+  const local = (function () {
+    let tweens = [];
+
+    /* Parte el h2 por sus <br> y envuelve cada línea en su máscara.
+       Guarda el original en data-raw; el diccionario lo borra al cambiar
+       de idioma, y así aquí se vuelve a leer el texto nuevo en vez de
+       repintar el viejo. */
+    function splitLines(el) {
+      if (!el) return [];
+      if (!el.dataset.raw) el.dataset.raw = el.innerHTML;
+      const html = el.dataset.raw;
+      el.innerHTML = html.split(/<br\s*\/?>/i)
+        .map(l => '<span class="line"><span>' + l + '</span></span>').join('');
+      return $$('.line > span', el);
+    }
+
+    function build() {
+      tweens.forEach(t => { t.scrollTrigger && t.scrollTrigger.kill(); t.kill && t.kill(); });
+      tweens = [];
+
+      const h2 = $('.local__lead h2');
+      const lines = splitLines(h2);
+      if (REDUCED) { gsap.set(lines, { yPercent: 0 }); return; }
+
+      tweens.push(gsap.from(lines, {
+        yPercent: 118, duration: 1.15, ease: 'expo.out', stagger: .085,
+        scrollTrigger: { trigger: h2, start: 'top 86%', once: true }
+      }));
+
+      $$('.arch').forEach((arch, i) => {
+        const frame = $('.arch__frame', arch);
+        const img = $('img', arch);
+        const cap = $('figcaption', arch);
+
+        /* el arco se abre y la foto se asienta a la vez */
+        const tl = gsap.timeline({ scrollTrigger: { trigger: arch, start: 'top 84%', once: true } });
+        tl.fromTo(frame,
+            { clipPath: 'inset(100% 0% 0% 0%)' },
+            { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.25, ease: 'expo.inOut' })
+          .fromTo(img, { scale: 1.18 }, { scale: 1, duration: 1.6, ease: 'power3.out' }, 0)
+          .fromTo(cap, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: .8, ease: 'power2.out' }, .45)
+          /* el filete del pie se dibuja de izquierda a derecha */
+          .fromTo(cap, { '--draw': 0 }, { '--draw': 1, duration: .9, ease: 'power2.out' }, .6);
+        tweens.push(tl);
+
+        /* parallax: la foto recorre el excedente del marco */
+        tweens.push(gsap.fromTo(img,
+          { yPercent: -7 },
+          {
+            yPercent: 7, ease: 'none',
+            scrollTrigger: { trigger: arch, start: 'top bottom', end: 'bottom top', scrub: .6 }
+          }));
+
+        if (!COARSE) {
+          const q = gsap.quickTo(img, 'scale', { duration: .9, ease: 'power3' });
+          arch.addEventListener('mouseenter', () => q(1.05));
+          arch.addEventListener('mouseleave', () => q(1));
+        }
+
+        /* Las dos columnas se separan un punto más al bajar. Apiladas
+           en móvil no tiene sentido: solo cuando van una al lado de la otra. */
+        if (window.matchMedia('(min-width: 721px)').matches) {
+          tweens.push(gsap.fromTo(arch,
+            { y: 0 },
+            {
+              y: i === 0 ? -34 : 34, ease: 'none',
+              scrollTrigger: { trigger: '.local__pair', start: 'top bottom', end: 'bottom top', scrub: .8 }
+            }));
+        }
+      });
+    }
+
+    build();
+    return { rebuild: build };
+  })();
 
   /* ---------- carta ---------- */
   const carta = (function () {
@@ -231,7 +297,8 @@
     const btn = $('#lang');
     const ES = {};
     $$('[data-i18n]').forEach(el => ES[el.dataset.i18n] = el.textContent);
-    $$('[data-i18n-html]').forEach(el => ES[el.dataset.i18nHtml] = el.innerHTML);
+    /* data-raw si lo hay: el titular del local ya viene troceado en líneas */
+    $$('[data-i18n-html]').forEach(el => ES[el.dataset.i18nHtml] = el.dataset.raw || el.innerHTML);
     const EN = window.SHUKA_EN || {};
     let lang = 'es';
 
@@ -244,12 +311,14 @@
       });
       $$('[data-i18n-html]').forEach(el => {
         const v = dict[el.dataset.i18nHtml];
-        if (v !== undefined) el.innerHTML = v;
+        if (v === undefined) return;
+        el.innerHTML = v;
+        delete el.dataset.raw;      /* para que se vuelva a trocear */
       });
       document.documentElement.lang = l;
       $$('#lang span').forEach((s, i) => s.classList.toggle('is-on', (i === 0) === (l === 'es')));
       carta.setLang && carta.setLang(l);
-      placeSign();
+      local.rebuild && local.rebuild();
       ScrollTrigger.refresh();
     }
     btn.addEventListener('click', () => apply(lang === 'es' ? 'en' : 'es'));
@@ -257,5 +326,5 @@
 
   $('#year').textContent = new Date().getFullYear();
   window.addEventListener('load', () => ScrollTrigger.refresh());
-  document.fonts && document.fonts.ready.then(() => { placeSign(); ScrollTrigger.refresh(); });
+  document.fonts && document.fonts.ready.then(() => ScrollTrigger.refresh());
 })();

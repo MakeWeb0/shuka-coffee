@@ -29,6 +29,8 @@
 /* --- los dos temas: cada bloque declara el suyo y todo lo de dentro
        (texto, filetes, acentos, botones) se sirve de estas variables --- */
 .t-dark{
+  --fd-w: 400;
+  --fd-opsz: 26;
   --ground: var(--brown);
   --ink:    var(--cream);
   --accent: var(--tan);
@@ -39,6 +41,8 @@
   --hole:   #4C372E;
 }
 .t-light{
+  --fd-w: 500;
+  --fd-opsz: 16;
   --ground: var(--paper);
   --ink:    var(--brown);
   --accent: var(--mocha);
@@ -67,17 +71,25 @@ body{
 }
 body.no-scroll{ overflow:hidden; }
 
-img{ max-width:100%; display:block; }
+img{ max-width:100%; height:auto; display:block; }
 a{ color:inherit; text-decoration:none; }
 button{ font:inherit; color:inherit; background:none; border:0; cursor:pointer; }
 ::selection{ background:var(--brown); color:var(--paper); }
 :focus-visible{ outline:2px solid var(--accent, var(--mocha)); outline-offset:4px; }
 
-/* --- titulares: la didone itálica de sus posts, apilada y apretada --- */
+/* --- titulares: la didone itálica de sus posts, apilada y apretada ---
+   Bodoni Moda es variable en peso y en tamaño óptico. El navegador ata
+   el eje opsz al tamaño de letra, así que a 4rem se va a ~70 y los
+   finos se quedan en un pelo: sobre el marrón aún se leen (el texto
+   claro engorda ópticamente) pero sobre el blanco desaparecen. Se fija
+   el opsz bajo, que es el corte pensado para texto y trae los trazos
+   finos más gruesos, y en los bloques claros se sube algo el peso. */
 h1,h2,h3{
   font-family:var(--fd);
   font-style:italic;
-  font-weight:400;
+  font-weight:var(--fd-w, 400);
+  font-optical-sizing:none;
+  font-variation-settings:'opsz' var(--fd-opsz, 22);
   letter-spacing:-.012em;
   line-height:1.02;
   margin:0;
@@ -203,20 +215,57 @@ body.menu-open .overlay{ visibility:visible; }
 .overlay__foot a{ border-bottom:1px solid currentColor; padding-bottom:.15rem; }
 
 /* =========================================================
-   PORTADA — el espejo, sobre el marrón de la marca
+   PORTADA — los tres vídeos del local
    ========================================================= */
 .hero{
   position:relative; min-height:100svh;
   display:grid; place-items:center; overflow:hidden;
   background:var(--brown); color:var(--cream);
 }
-.hero__gl{ position:absolute; inset:0; width:100%; height:100%; }
 
-/* El rótulo se coloca desde JS justo encima del espejo que dibuja
-   el shader, como el letrero pintado sobre la pared. */
+/* Las tres columnas, a sangre y a la vez. */
+.hero__videos{
+  position:absolute; inset:0; z-index:0;
+  /* minmax(0,1fr) y no 1fr: el mínimo automático de un <video> es su
+     alto/ancho intrínseco (960 px), así que con 1fr la rejilla crecía
+     hasta 2880 px y solo se veía el primero. */
+  display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
+}
+.hero__videos video{
+  width:100%; height:100%; object-fit:cover; display:block;
+  /* se desaturan para que la capa de color los tiña por igual */
+  filter:grayscale(1) brightness(.80) contrast(1.15);
+}
+
+/* Oscurecido: va DENTRO de .hero__videos, no en la capa de color.
+   mix-blend-mode:color conserva la luminosidad del fondo, así que si
+   la sombra estuviera en esa capa se perdería y no oscurecería nada. */
+.hero__videos::after{
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:
+    linear-gradient(rgba(29,20,17,.72), rgba(29,20,17,.34) 26%, rgba(29,20,17,.34) 68%, rgba(29,20,17,.78)),
+    radial-gradient(105% 72% at 50% 46%, rgba(29,20,17,.10), rgba(29,20,17,.72) 82%);
+}
+
+/* El tono de marca: en modo color toma el matiz del marrón y respeta la
+   luz del vídeo, que es justo el duotono del feed. Sin soporte de
+   mix-blend-mode se queda en una veladura marrón normal. */
+.hero__tint{
+  position:absolute; inset:0; z-index:1; pointer-events:none;
+  background:var(--brown);
+  opacity:.55;
+}
+@supports (mix-blend-mode:color){
+  .hero__tint{
+    /* un marrón algo más saturado: en modo color el matiz lo pone esta
+       capa, y con el de marca a secas el tinte se quedaba corto */
+    background:#6B3B21;
+    opacity:1; mix-blend-mode:color;
+  }
+}
+
 .hero__sign{
-  position:absolute; z-index:2;
-  left:50%; top:0; transform:translateX(-50%);
+  position:relative; z-index:2;
   display:grid; justify-items:center; gap:.9rem; text-align:center;
   opacity:0;
 }
@@ -227,10 +276,6 @@ body.menu-open .overlay{ visibility:visible; }
   font-weight:300; letter-spacing:.36em; text-transform:uppercase;
   color:var(--tan);
 }
-
-/* sin WebGL: composición centrada normal */
-.hero:not(.is-gl) .hero__sign{ position:static; transform:none; opacity:1; }
-.hero:not(.is-gl){ align-content:center; }
 
 .hero__cue{
   position:absolute; left:50%; bottom:2.2rem; transform:translateX(-50%);
@@ -251,7 +296,8 @@ body.menu-open .overlay{ visibility:visible; }
   padding-bottom:clamp(3rem,7vw,5.5rem);
 }
 .eyebrow{
-  font-family:var(--fd); font-style:italic; font-weight:400;
+  font-family:var(--fd); font-style:italic; font-weight:var(--fd-w, 400);
+  font-optical-sizing:none; font-variation-settings:'opsz' var(--fd-opsz, 22);
   font-size:clamp(.95rem, .7rem + .4vw, 1.2rem);
   color:var(--accent); margin:0 0 .9rem;
 }
@@ -272,16 +318,30 @@ body.menu-open .overlay{ visibility:visible; }
   border-radius:var(--arch-r);
   background:var(--hole);
 }
+/* La foto es más alta que su marco: ese excedente es el recorrido del
+   parallax, y por eso no aparece ningún borde al desplazarla. */
 .arch__frame img{
-  width:100%; height:100%; object-fit:cover;
-  transform:scale(1.03);
-  transition:transform 1.2s var(--e-out);
+  position:absolute; inset:-12% 0;
+  width:100%; height:124% !important; object-fit:cover;
+  will-change:transform;
 }
-.arch:hover .arch__frame img{ transform:scale(1); }
 .arch figcaption{
-  margin-top:.9rem; font-size:.66rem; letter-spacing:.2em;
+  display:flex; align-items:baseline; gap:.7rem;
+  margin-top:1rem; font-size:.66rem; letter-spacing:.2em;
   text-transform:uppercase; color:var(--accent);
 }
+/* filete que se dibuja con el pie de foto (--draw lo anima GSAP).
+   Registrado con @property para que sea interpolable; el valor inicial
+   es 1 para que sin JS el filete esté igualmente dibujado. */
+@property --draw{ syntax:'<number>'; inherits:false; initial-value:1; }
+.arch figcaption::after{
+  content:''; flex:1; height:1px; background:currentColor; opacity:.45;
+  transform:scaleX(var(--draw, 1)); transform-origin:left;
+}
+
+/* el titular se revela línea a línea, cada una tras su máscara */
+.local__lead .line{ display:block; overflow:hidden; }
+.local__lead .line > span{ display:block; will-change:transform; }
 
 /* =========================================================
    LA FRASE — bloque marrón, como uno de sus posts
@@ -354,10 +414,12 @@ body.menu-open .overlay{ visibility:visible; }
    descripción es lo que hay que leer, así que se cambian los papeles */
 .item--num .item__name{
   font-family:var(--fd); font-style:italic; font-size:1.1rem; color:var(--accent);
+  font-optical-sizing:none; font-variation-settings:'opsz' 12;
 }
 .item--num .item__desc{ font-size:.95rem; opacity:1; color:var(--ink); }
 .item__price{
   font-family:var(--fd); font-style:italic; font-size:1rem;
+  font-optical-sizing:none; font-variation-settings:'opsz' 12;
   color:var(--accent); font-variant-numeric:tabular-nums;
 }
 .item__desc{ grid-column:1 / -1; font-size:.78rem; font-weight:300; color:var(--faint); line-height:1.6; }
@@ -416,12 +478,23 @@ body.menu-open .overlay{ visibility:visible; }
   .info{ grid-template-columns:repeat(2,minmax(0,1fr)); }
 }
 @media (max-width:720px){
+  /* apilados no hace falta el desfase vertical entre los dos arcos */
+  .arch--r{ padding-top:0; }
   .nav__links{ display:none; }
   .nav .btn--sm{ display:none; }
   .burger{ display:block; }
   .local__pair{ grid-template-columns:1fr; gap:2.5rem; justify-items:center; }
   .arch--r{ padding-top:0; }
   .arch{ width:100%; max-width:420px; }
+}
+@media (max-width:720px){
+  /* En vertical, tres columnas dejan tiras de 130 px donde no se ve
+     nada. Se apilan en tres filas: siguen los tres a la vez y cada uno
+     recibe el ancho completo. */
+  .hero__videos{
+    grid-template-columns:minmax(0,1fr);
+    grid-template-rows:repeat(3,minmax(0,1fr));
+  }
 }
 @media (max-width:560px){
   .hero__sub{ letter-spacing:.22em; }

@@ -234,7 +234,7 @@ window.SHUKA_MENU = {
 window.SHUKA_EN = {
   'nav.local':'The place', 'nav.carta':'Menu', 'nav.visita':'Visit us', 'nav.cta':'Directions',
 
-  'ov.hours':'Mon — Fri · 8:30 — 16:00<br>Saturday · 8:30 — 14:00',
+  'ov.hours':'Mon — Fri · 8:30 — 14:00<br>Saturday · 8:30 — 13:30<br>Sunday · 9:00 — 13:30',
 
   'hero.cue':'Step inside',
 
@@ -249,10 +249,11 @@ window.SHUKA_EN = {
   'carta.t4':'Brunch', 'carta.t5':'Drinks',
   'carta.note':'Allergen information available at the counter · prices in euros, VAT included',
 
-  'visita.title':'Plaza de la Fruta,<br>number 24.',
-  'visita.dir':'Address', 'visita.hor':'Opening hours', 'visita.res':'Bookings', 'visita.sig':'Follow us',
-  'visita.dirV':'Plaza de la Fruta, 24<br>03202 Elche · Alicante',
-  'visita.horV':'Monday to Friday · 8:30 — 16:00<br>Saturday · 8:30 — 14:00<br>Sunday · closed',
+  'visita.title':'Plaça de la Fruita,<br>number 24.',
+  'visita.dir':'Address', 'visita.hor':'Opening hours', 'visita.tel':'Phone',
+  'visita.res':'Bookings', 'visita.sig':'Follow us',
+  'visita.dirV':'Plaça de la Fruita, 24<br>03202 Elx · Alicante',
+  'visita.horV':'Monday to Friday · 8:30 — 14:00<br>Saturday · 8:30 — 13:30<br>Sunday · 9:00 — 13:30',
   'visita.resV':'No booking. Just walk in.',
   'visita.cta1':'Get directions', 'visita.cta2':'See Instagram'
 };
